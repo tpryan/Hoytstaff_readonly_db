@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init(event)"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Database">
+	<fx:Script>
+		<![CDATA[
+			import services.PersonDAO;
+			
+			import events.DAOResultEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			protected var personDAO:PersonDAO = new PersonDAO();
+			[Bindable]
+			protected var persons:ArrayCollection = new ArrayCollection();
+			
+			
+			protected function init(event:FlexEvent):void
+			{
+				personDAO.addEventListener("ready",handleDAOReady);
+			}
+			
+			protected function handleList(event:DAOResultEvent):void
+			{
+				persons = event.result as ArrayCollection;
+				personDAO.removeEventListener("result", handleList);
+			}
+			
+			protected function handleDAOReady(event:Event):void
+			{
+				personDAO.removeEventListener("ready",handleDAOReady);
+				personDAO.addEventListener("result",handleList);
+				personDAO.list();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	<s:List left="10" right="10" top="10" bottom="10" dataProvider="{persons}" labelFunction="getFullName">
+		<fx:Script>
+			<![CDATA[
+				private function getFullName(obj:Object):String{
+					return obj.firstName + " " + obj.lastName; 
+				}	
+			]]>
+		</fx:Script>
+	</s:List>
+	
+</s:View>
